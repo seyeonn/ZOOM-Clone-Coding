@@ -186,3 +186,27 @@ socket.on("message", (message) => {
 
 
 
+## #1.5 Recap
+
+- 우리는 frontEnd와 backEnd 두 곳에서 event를 listen하고 있다.
+- backEnd에서는 websocket server를 만들었다.
+- 그리고 connection이라는 event를 listen하고 있다.
+- connection이 연결되면 socket에서 누가 연결했는지 확인할 수 있다.
+- JavaScript는 방금 연결된 socket을 채워줄 것이다.
+- 브라우저가 연결되었고, 브라우저마다 연결된 socket에서 event를 listen할 수 있다.
+- socket이 connection을 종료시키면 예를 들어, 브라우저의 탭을 닫거나, 컴퓨터가 잠자기 모드에 들어가면 우리는 close해줄 것이다.
+- 또한, 우리는 특정 socket에서 메세지를 기다리고 있다.
+- 메세지를 기다리기 위해 event listener를 등록해준다. (서버에는 등록하지 않음 - 이 event listener는 backEnd와 연결한 각 브라우저를 위한 것이기 때문)
+- ```wss```는 서버 전체를 위한 것이다.
+- ```socket.on message```는 특정 socket에서 message를 받았을 때 발생한다.
+
+
+---
+
+1. event listener를 추가해주었고, message를 브라우저로 전달했다.
+2. 브라우저에서는 backEnd와 connection을 열어주고 있다.
+3. 그리고 다시 event listener를 등록해주었다.
+4. frontEnd -> backEnd / backEnd -> frontEnd로 message를 보낼 수 있다.
+5. frontEnd와 backEnd가 양방향 연결이 되었다.
+6. 마지막으로 형식이 같으니 frontEnd와 backEnd 파일 구분 잘 하자!
+
