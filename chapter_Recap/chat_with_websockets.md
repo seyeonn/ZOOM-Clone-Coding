@@ -210,3 +210,45 @@ socket.on("message", (message) => {
 5. frontEnd와 backEnd가 양방향 연결이 되었다.
 6. 마지막으로 형식이 같으니 frontEnd와 backEnd 파일 구분 잘 하자!
 
+
+
+## #1.6 Chat Completed
+
+- html에서 form을 통해 message를 server에 전달.
+- server에서 event Listener를 통해 message 전달 받음.
+
+->frontEnd의 form에서 backEnd로 메세지를 전송하고 있다.
+
+![image](https://i.imgur.com/YwxGyDw.png)
+
+- hello를 쓰고 버튼을 클릭하면 텍스트박스가 비워진다.
+
+![image](https://i.imgur.com/6pYSEVq.png)
+![image](https://i.imgur.com/ImpNlO8.png)
+
+- backEnd로 메세지 전송 결과
+
+![image](https://i.imgur.com/emNAzeH.png)
+
+- backEnd에서 frontEnd로 같은 메세지를 다시 돌려준다.
+
+![image](https://i.imgur.com/PjNguq4.png)
+
+- backEnd로부터 메세지를 받았다. 
+
+![image](https://i.imgur.com/BEAILHG.png)
+
+- 한 개의 서버가 서로 다른 두 브라우저로 부터 메세지를 받고 있다. (그렇지만 아직 chrome에 연결을 안 해줬기 때문에 다른 브라우저는 서로 메세지를 주고 받지 못한다.)
+
+- 코드가 두 개의 브라우저에 연결되는데 몇명인지는 모른다. 그래서 fake database를 만들어줄 것이다.
+
+- 누군가 우리 서버에 연결하면, 그 connection을 sockets라는 배열 변수에 넣어줄 것이다.
+
+- 이렇게 하면 받은 메세지를 다른 모든 socket에게 전달해 줄 수 있다.
+
+![image](https://i.imgur.com/3MA9ArD.png)
+
+- 실행 결과 화면
+
+![image](https://i.imgur.com/9QBsrs3.png)
+
