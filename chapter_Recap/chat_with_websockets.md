@@ -314,6 +314,66 @@ function handleNickSubmit(event) {
 }
 ```
 
+## #1.8 Nicknames part Two
+
+- 왜 Object를 Stirng으로 바꿔줘야 할까?
+
+-> websocket이 브라우저에 있는 API이기 때문이다. backEnd에서는 다양한 프로그래밍 언어를 사용할 수 있기 때문에 이 API는 어떠한 판단도 하면 안된다.
+
+- JSON.parse는 String을 JavaScript object로 바꿔준다.
+
+- type: 메세지의 종류
+
+- payload: 메세지에 담겨있는 중요한 정보
+
+- type에 구분하여 payload 정보를 보낸다.
+
+```js
+socket.on("message", (message) => {
+        const parsed = JSON.parse(message);
+        switch(parsed.type){
+            case "new_message":
+                sockets.forEach((aSocket) => aSocket.send(parsed.payload));
+            case "nickname":
+                console.log(parsed.payload);
+        }
+    });
+```
+
+- socket은 기본적으로 객체이기 때문에 nickname을 저장해주기 위해서 새로운 item을 추가해준다.
+
+- 익명인 경우를 대비해서 socket이 연결될 때 Anon으로 설정해준다.
+```js
+socket["nickname"] = "Anon";
+```
+
+- 실행 결과 화면
+
+![image](https://i.imgur.com/OkBVk4a.png)
+
+```js
+wss.on("connection", (socket) => {
+    sockets.push(socket);
+    socket["nickname"] = "Anon";
+    console.log("Connected to Browser ✅");
+    socket.on("close", () => console.log("Disconnected from the Browser ❌"));
+    socket.on("message", (msg) => {
+        const message = JSON.parse(msg);
+        switch(message.type){
+            case "new_message":
+                sockets.forEach((aSocket) => aSocket.send(`${socket.nickname} : ${message.payload}`));
+            case "nickname":
+                socket["nickname"] = message.payload;
+        }
+    });
+});
+```
+-> 서버에서 이부분이 각 브라우저를 통해 2번 실행되는 것이다.
+
+-> socket 안에 정보를 저장할 수 있다.
+
+
+
 
 
 
