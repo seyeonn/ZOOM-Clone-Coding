@@ -252,3 +252,73 @@ socket.on("message", (message) => {
 
 ![image](https://i.imgur.com/9QBsrs3.png)
 
+
+
+## #1.7 Nicknames part One
+
+- 화면에 메세지 띄우기
+
+```js
+socket.addEventListener("message", (message) => {
+    const li = document.createElement("li");
+    li.innerText = message.data;
+    messageList.append(li);
+});
+```
+
+- 실행 결과 화면 (익명 챗)
+
+![image](https://i.imgur.com/irPFDw5.png)
+
+- frontEnd에서 nickname을 정할 form을 생성해주는데, 이 경우 backEnd에서 message를 구분하지 못하는 문제가 발생한다. 우리가 메세지를 보낼 때 그냥 모두에게 보내고 있기 때문이다.
+
+- 메세지를 구별해주기 위해서 메세지 type을 설정해주어야 한다.
+
+- 그래서 그냥 text를 보내는 대신 JSON으로 보낼 것이다. (socket은 String data만 보낼 수 있다.)
+
+```js
+{
+    type: "message",
+    payload: "hello everyone!"
+
+}
+
+{
+    type: "nickname",
+    payload: "nico"
+}
+```
+- 이렇게 보내면 Object로 전달이 되는데 우리는 이것을 string으로 parse시킬 것이다. string으로 바뀐 object는 backEnd로 전송되고 backEnd는 다시 그 string을 object로 바꿔줄 것이다.
+
+- 메세지를 전송하고 싶을 때 이 코드를 불러주면 된다.
+
+```js
+function makeMessage(type, payload) {
+    const msg = {type, payload};
+    return JSON.stringify(msg);
+}
+```
+
+```js
+function handleSubmit(event) {
+    event.preventDefault();
+    const input = messageForm.querySelector("input");
+    socket.send(makeMessage("new_message", input.value));
+    input.value = "";
+}
+
+function handleNickSubmit(event) {
+    event.preventDefault();
+    const input = nickForm.querySelector("input");
+    socket.send(makeMessage("nickname", input.value));
+}
+```
+
+
+
+
+
+
+
+
+
