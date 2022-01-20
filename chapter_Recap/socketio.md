@@ -161,3 +161,25 @@ socket.emit("enter_room", {payload: input.value}, () => {
 
 
 
+## #2.3 Recap
+
+1. socketIO를 이용하면, 모든 것이 message일 필요가 없다. (여러 type의 message가 생기면 message function이 엄청 커지기 때문에 힘들어짐.) 
+
+2. client는 너가 원하는 **어떠한 event든 모두** ```emit```해줄 수 있다.
+
+3. 전송할 때 정말 우리가 **원하는 아무거나 전송**이 가능하다. (그 전에는 text만 전송할 수 있었음.)
+
+4. 한 가지만 보내야한다는 제약이 없다. 우리가 **원하는 만큼 전송**할 수 있다.
+
+5. 연결 이상이 감지되면 재연결을 자동으로 시도해준다. 연결이 끊어졌다가 다시 연결되면 에러가 자동으로 사라진다.
+
+6. ```socket.emit```과 ```socket.on```에는 **같은 이름**을 사용해야 한다.
+
+7. socket에서 메세지를 받고 싶을 때, 처리 비용이 크고 시간이 오래걸리는 작업이어도 frontEnd에 작업을 완료했다고 알리고 싶을 때 등 function을 보내고 싶으면 해당 function을 마지막 argument에 넣으면 된다. backEnd가 그 코드를 실행시키는 것이 아니고 (보안상 문제가 생김) backEnd에서 function을 실행시켰을 때 frontend에서 function을 실행시킬 것이다.
+
+8. frontEnd에서 실행 된 코드는 backEnd가 실행을 시킨 것이다.
+
+
+
+
+
