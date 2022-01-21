@@ -181,5 +181,106 @@ socket.emit("enter_room", {payload: input.value}, () => {
 
 
 
+## #2.4 Rooms
+
+- socketIO는 기본적으로 room을 제공한다.
+
+- socket에는 id가 있다. 
+
+- socket.onAny(callback)은 어느 event에서든지 console.log를 할 수 있다.
+
+```js
+socket.onAny((event) => {
+        console.log(`Socket Event : ${event}`);
+    });
+```
+
+```js
+ console.log(socket.rooms);
+        socket.join(roomName);
+        console.log(socket.rooms);
+```
+
+- 1212 입력하고 버튼 누른 후 결과
+
+![image](https://i.imgur.com/FKEeo0A.png)
+
+- user의 id는 user가 있는 방의 id와 같다. 왜냐하면 socketIO에서 모든 socket은 기본적으로 User와 서버 사이에 private room이 있기 때문이다.
+
+- 즉, 그냥 방에 들어가기 위해서 socket.join을 하면 된다.
+
+- socket이 어떤 방에 있는지 알기 위해서는 socket.rooms를 하면 된다.
+
+- socket에는 id가 있어서 id로 구별이 가능하다.
+
+- 방 접속을 구현해보자.
+
+```server.js```
+
+```js
+wsServer.on("connection", (socket) => {
+    socket.onAny((event) => {
+        console.log(`Socket Event: ${event}`);
+    });
+    socket.on("enter_room", (roomName, done) => {
+        socket.join(roomName);
+        done();
+    });
+});
+```
+
+```app.js```
+
+```js
+const room = document.getElementById("room");
+
+room.hidden = true;
+
+let roomName;
+
+function showRoom() {
+    welcome.hidden = true;
+    room.hidden = false;
+    const h3 = room.querySelector("h3");
+    h3.innerText = `Room ${roomName}`;
+}
+function handleRoomSubmit(event) {
+    event.preventDefault();
+    const input = form.querySelector("input");
+    socket.emit("enter_room", input.value, showRoom);
+    roomName = input.value;
+    input.value = "";
+}
+
+form.addEventListener("submit", handleRoomSubmit);
+```
+
+```home.pug```
+
+```js
+main
+            div#welcome
+                form
+                    input(placeholder="room name", required, type="text")
+                    button Enter Room
+            div#room
+                h3  
+                ul
+                form
+                    input(placeholder="message", required, type="text")
+                    button Send
+        script(src="/socket.io/socket.io.js")
+```
+
+
+
+
+
+
+
+
+
+
+
 
 
