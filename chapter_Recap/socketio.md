@@ -274,6 +274,51 @@ main
 
 
 
+## #2.5 Room Messages
+
+```js
+socket.to(roomName).emit("welcome");
+```
+
+-> "welcome" event를 roomName에 있는 모든 사람들에게 emit한다.
+
+```js
+done();
+```
+
+-> done() function은 FrontEnd에 있는 showRoom()을 실행한다.
+-> 그 이후에 event를 방금 참가한 방 안에 있는 모든 사람에게 emit해준다.
+
+```js
+function addMessage(message) {
+    const ul = room.querySelector("ul");
+    const li = document.createElement("li");
+    li.innerText = message;
+    ul.appendChild(li);
+}
+```
+-> 언제든지 메세지를 보낼 수 있는 함수
+
+```js
+socket.on("welcome", () => {
+    addMessage("someone joined!");
+});
+```
+-> 함수 실행 코드 (FrontEnd)
+
+```js
+socket.on("enter_room", (roomName, done) => {
+        socket.join(roomName);
+        done();
+        socket.to(roomName).emit("welcome");
+    });
+```
+-> 함수 실행 코드 (BackEnd)
+
+![image](https://i.imgur.com/kcOLfDg.png)
+
+-> 유저 입장 후 룸 생성 - 또다른 유저 입장 시 'someone joined!' 채팅 실행
+
 
 
 
