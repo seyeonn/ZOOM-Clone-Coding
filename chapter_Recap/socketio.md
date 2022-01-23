@@ -442,5 +442,72 @@ socket.on("new_message", (msg, room, done) => {
 
 
 
+## #2.8 Room Count part One
+
+### Adapter
+
+- Adapter가 기본적으로 하는 일은 다른 서버들 사이에 실시간 어플리케이션을 동기화 하는 것이다.
+
+- 지금 우리는 서버의 메모리에서 Adapter를 사용하고 있다. 데이터베이스에는 아무것도 저장하고 있지 않다.
+
+- 우리가 서버를 종료하고 다시 시작할 때 모든 room과 message와 socket은 없어진다. (= 재시작할 때 모든 것들이 처음부터 다시 시작된다.)
+
+- 우리는 그래서 백엔드에 데이터베이스를 가지고 싶을 것이다.
+
+- 그리고 앱 안에 많은 클라이언트가 있을 때, 모든 클라이언트에 대해서 connection을 열어둬야 한다.
+
+- 그 연결은 실시간으로 서버에 있어야 한다. 그렇기 때문에 서버는 이 connection을 오픈된 상태를 유지해야 한다.
+
+- 서버 메모리에서 Adapter를 사용하고 있다면 우리가 만든 3개의 서버는 같은 memory pool을 공유하지 않을 것이다.
+
+-> 데이터베이스를 사용해서 Adapter 역할을 잘 활용해보자!
+
+
+---
+
+- chapter의 목표 : ** socket의 ID를 뜻하는 sids를 가져와서 방들을 보고 이 방들이 어떤 socket을 위해서 만들어졌는지 확인해보자** (private 메세지와 모든 사람들과 채팅하기 위해 만든 방이 어떤건지)
+
+![image](https://i.imgur.com/pxH7FDo.png)
+
+-> Private Rooms 2개와 Public Room 1개 
+
+-> 이 Map에 있는 모든 rooms를 확인하고 room의 id도 확인해보자!
+
+-> 만약 room ID를 socket ID에서 찾을 수 있다면 우리가 Private용 room을 찾은 것이다.
+
+-> 만약 room ID를 socket ID에서 찾을 수 없다면 우리가 Public room을 찾은 것이다.
+
+-> 그걸 하기 위해선 Map 데이터 구조를 봐야 한다. 
+
+![image](https://i.imgur.com/W7gV7vr.png)
+
+-> sids에 대한 map을 만들자. (sids는 우리 BackEnd에 연결된 모든 sockets들의 map이다.)
+
+-> 때때로 socket id는 room id와 같다.
+
+-> 모든 socket은 private room이 있다는 것을 명심하자. 이것은 바로 id가 방제목인 경우이다. 그래서 우리는 private message를 보낼 수 있다.
+
+-> get과 key를 이용해서 key가 socket id인지 아니면 방제목인지 확인할 수 있다.
+
+![image](https://i.imgur.com/aWnxO33.png)
+
+```js
+function publicRooms() {
+    const {
+        sockets: {
+            adapter: {sids, rooms},
+        },
+    } = wsServer;
+    const publicRooms = [];
+    rooms.forEach((_, key) => {
+        if(sids.get(key) === undefined) {
+            publicRooms.push(key);
+        }
+    });
+}
+```
+
+
+
 
 
