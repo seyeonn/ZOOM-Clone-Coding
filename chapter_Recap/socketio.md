@@ -627,3 +627,39 @@ socket.on("bye", (left, newCount) => {
 
 
 
+## #2.11 Admin Panel
+
+### Admin UI
+
+- socket.IO 백엔드를 위한 Admin UI
+
+- 모든 room과 클라이언트를 확인할 수 있다.
+
+- 데모가 작동하는 데 필요한 환경설정
+
+```js
+import {Server} from "socket.io";
+import {instrument} from "@socket.io/admin-ui";
+
+const wsServer = new Server(httpServer, {
+    cors: {
+        origin: ["https://admin.socket.io"],
+        credentials: true,
+    },
+});
+
+instrument(wsServer, {
+    auth: false
+});
+```
+
+- 링크 접속 후
+
+![image](https://i.imgur.com/bxmE9QQ.png)
+
+![image](https://i.imgur.com/UNSO2Vl.png)
+
+- admin과 non-admin(/)으로 구분된다.
+
+- socket과 client, private room 등 원하는 정보를 한 눈에 살펴볼 수 있다.
+
