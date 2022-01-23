@@ -572,5 +572,58 @@ socket.on("room_change", (rooms) => {
 
 
 
+## #2.10 User Count
+
+- set의 사이즈를 구해보자.
+
+![image](https://i.imgur.com/XmOaKej.png)
+
+- user는 입장하고 퇴장할 때 인원수가 수정된다.
+
+- 수를 세주는 function을 만들어보자.
+
+```js
+function countRoom(roomName) {
+    return wsServer.sockets.adapter.rooms.get(roomName)?.size;
+}
+```
+
+-> 중간에 '?'는 가끔 roomName을 찾을 수 있지만 아닐 수도 있기 때문에 넣어줬다. 
+-> 우리 방이 얼마나 큰지 계산한다. 몇명이 들어와있는지. 
+-> welcome event를 보낼 때  countRoom의 결과값도 같이 보낸다는 의미이다.
+
+```server.js```
+
+```js
+socket.to(roomName).emit("welcome", socket.nickname, countRoom(roomName));
+```
+
+```js
+socket.to(room).emit("bye", socket.nickname, countRoom(room)-1));
+```
+-> 아직 방을 떠나지 않았기 때문에 현재 서버도 포함되어서 계산이 된다. 그렇기 때문에 현재 room을 빼고 countRoom(room)-1 로 계산해주어야 한다.
+
+-> 즉, welcome과 bye를 할 때 newCount를 받는다.
+
+```app.js```
+
+```js
+socket.on("welcome", (user, newCount) => {
+    const h3 = room.querySelector("h3");
+    h3.innerText = `Room ${roomName} (${newCount})`;
+    addMessage(`${user} arrived!`);
+});
+
+socket.on("bye", (left, newCount) => {
+    const h3 = room.querySelector("h3");
+    h3.innerText = `Room ${roomName} (${newCount})`;
+    addMessage(`${left} left ㅠㅠ`);
+});
+```
+
+- 실행 결과 화면
+
+![image](https://i.imgur.com/l9cZyxL.png)
+
 
 
