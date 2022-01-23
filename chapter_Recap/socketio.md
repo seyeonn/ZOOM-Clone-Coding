@@ -399,6 +399,48 @@ socket.on("new_message", addMessage);
 
 
 
+## #2.7 Nicknames
+
+- nickname과 message를 위한 form 생성
+
+```app.js```
+
+```js
+function handleNicknameSubmit(event) {
+    event.preventDefault();
+    const input = room.querySelector("#name input");
+    socket.emit("nickname", input.value);
+}
+```
+
+```js
+const nameForm = room.querySelector("#name");
+
+nameForm.addEventListener("submit", handleNicknameSubmit);
+```
+
+```server.js```
+
+```js
+socket.on("nickname", nickname => (socket["nickname"] = nickname));
+```
+
+-> "nickname" event가 발생하면 nickname을 가져와서 socket에 저장한다.
+
+```js
+socket.on("new_message", (msg, room, done) => {
+        socket.to(room).emit("new_message", `${socket.nickname}: ${msg}`);
+        done();
+    });
+```
+
+-> nickname과 msg 전달
+
+- 실행 결과 화면
+
+![image](https://i.imgur.com/28xEDwF.png)
+
+
 
 
 
