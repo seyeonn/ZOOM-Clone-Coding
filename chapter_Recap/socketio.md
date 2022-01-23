@@ -509,5 +509,68 @@ function publicRooms() {
 
 
 
+## #2.9 Room Count part Two
+
+```js
+socket.to(roomName).emit("welcome", socket.nickname);
+```
+-> 메세지를 하나의 socket에만 보낸다.
+
+```js
+wsServer.sockets.emit("room_change", publicRooms());
+```
+
+-> 메세지를 모든 socket에 보내준다.
+
+- user가 나가면 room도 사라지게 해주자.
+
+```js
+socket.on("disconnect", () => {
+        wsServer.sockets.emit("room_change", publicRooms());
+    });
+```
+
+- room_change event가 발생했을 때 rooms배열을 저장해준다.
+
+```js
+socket.on("room_change", (rooms) => {
+    const roomList = welcome.querySelector("ul");
+    rooms.forEach(room => {
+        const li = document.createElement("li");
+        li.innerText = room;
+        roomList.append(li);
+    });
+})
+```
+
+-> 방에 들어가기 전 기다릴 때 열려있는 모든 방의 list를 확인할 수 있다. 
+
+- 실행 결과 화면
+
+![image](https://i.imgur.com/VMASkdV.png)
+
+```js
+socket.on("room_change", (rooms) => {
+    const roomList = welcome.querySelector("ul");
+    if(rooms.length === 0) {
+        roomList.innerHTML = "";
+        return;
+    }
+    rooms.forEach(room => {
+        const li = document.createElement("li");
+        li.innerText = room;
+        roomList.append(li);
+    });
+})
+```
+
+-> rooms가 없는 상태로 오면, 즉 내 어플리케이션에 room이 하나도 없을 때 모든 것을 비워주는 코드
+
+-> but, room 또 생성시 전에 저장된 room이 한번 더 저장이 된다. 문제 발생!
+
+-> 이런 일이 없도록 항상 roomList를 비워주도록 하자. 늘 새로운 list가 되도록!
+
+
+
 
 
