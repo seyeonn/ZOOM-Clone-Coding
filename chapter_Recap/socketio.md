@@ -321,8 +321,81 @@ socket.on("enter_room", (roomName, done) => {
 
 
 
+## #2.6 Room Notifications
 
+### disconnect vs disconnecting
 
+**disconnect** : 연결이 완전히 끊겼음.
+**disconnecting** : 고객이 접속을 중단할 것이지만 아직 방을 완전히 나가지는 않은 것. (창을 닫거나 컴퓨터가 꺼졌을 때 방에 message를 보낼 수 있음.)
+
+```server.js```
+
+```js
+socket.on("disconnecting", () => {
+        socket.rooms.forEach(room => socket.to(room).emit("bye"));
+    })
+```
+
+```app.js```
+
+```js
+socket.on("bye", () => {
+    addMessage("someone left ㅠㅠ");
+});
+```
+
+- 실행 결과 화면
+
+![image](https://i.imgur.com/YMO9vWf.png)
+
+- 메세지 송수신
+
+```server.js```
+
+```js
+socket.on("new_message", (msg, room, done) => {
+        socket.to(room).emit("new_message", msg);
+        done();
+    })
+```
+
+```app.js```
+
+```js
+function addMessage(message) {
+    const ul = room.querySelector("ul");
+    const li = document.createElement("li");
+    li.innerText = message;
+    ul.appendChild(li);
+}
+
+function handleMessageSubmit(event) {
+    event.preventDefault();
+    const input = room.querySelector("input");
+    const value = input.value;
+    socket.emit("new_message", input.value, roomName, () => {
+        addMessage(`You: ${value}`);
+    });
+    input.value = "";
+}
+
+function showRoom() {
+    welcome.hidden = true;
+    room.hidden = false;
+    const h3 = room.querySelector("h3");
+    h3.innerText = `Room ${roomName}`;
+    const form = room.querySelector("form");
+    form.addEventListener("submit", handleMessageSubmit);
+}
+
+form.addEventListener("submit", handleRoomSubmit);
+
+socket.on("new_message", addMessage);
+```
+
+- 실행 결과 화면
+
+![image](https://i.imgur.com/PzJVmKX.png)
 
 
 
