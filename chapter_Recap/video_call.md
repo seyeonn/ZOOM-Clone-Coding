@@ -126,5 +126,106 @@ const cameras = devices.filter(device => device.kind === "videoinput");
 
 
 
+## #3.2 Camera Switch
+
+- 카메라 전환을 구현
+  1. select에 input이 변경되었는지 감지하기. -> addEventListener() 활용
+  2. 이후 video를 다시 시작하게 만들기. -> getMedia() 재호출
+  3. getMedia function으로 사용하려는 특정 카메라 Id를 전송한다.
+  4. 처음에 deviceId가 없이 getMedia()를 호출했을 때를 대비하여  constraints를 설정해준다. 
+  5. deviceID의 유무에 따라 getMedia() 설정을 달리 해준다.
+  6. cameras는 한번만 불러오면 된다.
+  7. 현재 사용하고 있는 카메라가 select에 보여지도록 한다. -> myStream.getVideoTracks() 활용
+
+
+
+- 3번 코드
+
+```js
+async function getMedia(deviceId) {
+    try{
+        myStream = await navigator.mediaDevices.getUserMedia(
+          {
+              audio: true,
+              video: true,
+          });
+          myFace.srcObject = myStream;
+          await getCameras();
+    } catch(e) {
+        console.log(e);
+    }
+}
+getMedia();
+
+async function handleCameraChange() {
+    await getMedia(cameraSelect.value);
+}
+
+cameraSelect.addEventListener("input", handleCameraChange);
+```
+
+- 4/5번 코드
+```js
+const initialConstraints = {
+        audio: true,
+        video: { facingMode : "user"},
+    };
+
+const cameraConstraints = {
+        audio : true,
+        video: {deviceId: { exact: deviceId }},
+    };
+
+try{
+        myStream = await navigator.mediaDevices.getUserMedia(
+            deviceId ? cameraConstraints : initialConstraints
+        );
+          myFace.srcObject = myStream;
+          if(!deviceId) {
+            await getCameras();
+          }
+    } catch(e) {
+        console.log(e);
+    }
+```
+
+-> initialConstraints는 deviceId가 없을 때 실행된다. cameras를 만들기 전.
+
+-> cameraConstraints는 deviceId가 있을 때 실행된다.
+
+-> 처음 getMedia를 불러올 때만 getCameras()가 실행된다.
+
+- 6/7번 코드
+
+```js
+async function getCameras() {
+    try {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const cameras = devices.filter(device => device.kind === "videoinput");
+        const currentCamera = myStream.getVideoTracks()[0];
+        cameras.forEach(camera => {
+            const option = document.createElement("option");
+            option.value = camera.deviceId;
+            option.innerText = camera.label;
+            if(currentCamera.label === camera.label) {
+                option.selected = true;
+            }
+            cameraSelect.appendChild(option);
+        });
+    } catch (e) {
+        console.log(e);
+    }
+}
+
+```
+->  myStream.getVideoTracks() 활용하여 현재 사용하는 카메라를 select에 띄운다.
+
+-> stream의 현재 카메라와 paint할 때의 카메라 option을 가져온다.
+
+-> 만약 카메라 option이 현재 선택된 카메라와 같은 label을 가지고 있다면 이것이 우리가 사용하고 있는 카메라라는 것을 알 수 있다.
+
+
+
+
 
 
