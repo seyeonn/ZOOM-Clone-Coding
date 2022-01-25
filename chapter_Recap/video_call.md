@@ -70,3 +70,61 @@ cameraBtn.addEventListener("click", handleCameraClick);
 
 -> 버튼 클릭시 on -> off / mute -> unmute로 변경.
 
+## #3.1 Call Controls
+
+- Stream은 track이라는 것을 제공해준다. 비디오나 오디오, 자막은 하나의 track이 될 수 있다. 
+
+![image](https://i.imgur.com/pcq7INq.png)
+
+- 버튼 클릭시 audio mute/unmute
+
+```js
+myStream.getAudioTracks().forEach(track => (track.enabled = !track.enabled));
+```
+
+- 버튼 클릭시 vedio camera on/off
+
+```js
+myStream.getVideoTracks().forEach(track => (track.enabled = !track.enabled));
+```
+
+- getUserMedia() : 유저의 카메라와 오디오를 가져온다.
+
+- enumerateDevices() : 모든 장치와 미디어 장치를 알려준다. (컴퓨터에 연결되거나 모바일이 가지고 있는 장치들)
+
+```js
+async function getCameras() {
+    try {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const cameras = devices.filter(device => device.kind === "videoinput");
+        console.log(cameras);
+    } catch (e) {
+        console.log(e);
+    }
+}
+```
+
+-> 모든 장치들 중 camera 2개만 적용 = 유저의 비디오에 접근.
+
+- camera의 deviceId와 label을 알아내서 select박스로 option을 추가해보자.
+
+```js
+const cameraSelect = document.getElementById("cameras");
+
+const cameras = devices.filter(device => device.kind === "videoinput");
+        cameras.forEach(camera => {
+            const option = document.createElement("option");
+            option.value = camera.deviceId;
+            option.innerText = camera.label;
+            cameraSelect.appendChild(option);
+        });
+```
+
+![image](https://i.imgur.com/SNTsQNS.png)
+
+-> 물론 우리에게 중요한 것은 label이 아닌 deviceId이다.
+
+
+
+
+
