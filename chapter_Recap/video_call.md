@@ -245,4 +245,73 @@ async function getCameras() {
 - 브라우저는 서버한테 settings와 configuration, 브라우저의 위치, 방화벽이나 라우터가 있는지 등등의 정보만 전달한다. 그리고 서버는 그 정보를 다른 브라우저에 전달한다. 이후 브라우저는 서로를 찾을 수 있게 된다.
 
 
+## #3.4 Rooms
+
+- 방 이름 작성후 입장하여 비디오 및 오디오를 활성해보자.
+
+```home.pug```
+
+```js
+div#welcome
+                form
+                    input(placeholder="room name", required, type="text")
+                    button Enter room
+            div#call
+                div#myStream
+                    video#myFace(autoplay, playsinline, width="400", height="400")
+                    button#mute Mute
+                    button#camera Turn Camera Off
+                    select#cameras
+```
+
+```app.js```
+
+```js
+// Welcome Form (join a room)
+
+
+const welcome = document.getElementById("welcome");
+const welcomeForm = welcome.querySelector("form");
+
+function startMedia() {
+    welcome.hidden = true;
+    call.hidden = false;
+    getMedia();
+}
+
+function handleWelcomeSubmit(event) {
+    event.preventDefault();
+    const input = welcomeForm.querySelector("input");
+    socket.emit("join_room", input.value, startMedia);
+    roomName = input.value;
+    input.value="";
+}
+
+welcomeForm.addEventListener("submit", handleWelcomeSubmit);
+
+
+// Socket Code
+
+
+socket.on("welcome", () => {
+    console.log("someone joined");
+})
+```
+
+```server.js```
+
+```js
+
+wsServer.on("connection", (socket) => {
+    socket.on("join_room", (roomName, done) => {
+        socket.join(roomName);
+        done();
+        socket.to(roomName).emit("welcome");
+    })
+})
+```
+
+- 실행 결과 화면
+
+![image](https://i.imgur.com/IxCfHVN.png)
 
