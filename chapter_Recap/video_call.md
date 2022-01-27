@@ -315,3 +315,43 @@ wsServer.on("connection", (socket) => {
 
 ![image](https://i.imgur.com/IxCfHVN.png)
 
+
+
+## #3.5 Offers
+
+- 두 서버를 연결시키자.
+  1. peerConnection을 두개의 브라우저에 만든다.
+  2. addStream을 사용한다. 사용하는 카메라에서 오는 이 stream을 가져다가 이 stream의 데이터를 가져다가 연결을 만들 것이다. 우리는 영상과 오디오를 연결을 통해 전달할 것이다. 그러므로 peer-to-peer 연결 안에 영상과 오디오를 집어넣어야 한다.
+  3. peer A는 createOffer를 생성하고 peer B는 createAnswer를 생성한다.
+    - 방에 참가하면 알림을 받는 브라우저가 peer A
+  4. setLocalDescription을 만든다. 우리가 만든 offer로 연결을 구성해야 한다. 
+
+
+- 1/2/3번 실행 결과 화면 (offer 확인)
+
+![image](https://i.imgur.com/wpnvqvc.png)
+
+```js
+socket.on("welcome", async () => {
+    const offer = await myPeerConnection.createOffer();
+    myPeerConnection.setLocalDescription(offer);
+    socket.emit("offer", offer, roomName);
+})
+```
+-> 이 코드는 peer A 브라우저에서만 실행된다. 알림을 받는 건 peer A 뿐이기 때문.
+
+```js
+socket.on("offer", (offer) => {
+    console.log(offer);
+})
+```
+-> 이 코드는 peer B 브라우저에서만 실행된다. offer도 포함되어 있음.
+
+- 3/4번 실행 결과 화면
+
+![image](https://i.imgur.com/egjtuWz.png)
+
+-> peer B 브라우저에 offer이 전달되었다.
+
+-> 이것이 바로 Signaling process이다. 즉, offer를 주고 받기 위해서는 서버가 필요하다. offer가 주고 받아진 순간, 우리는 직접적으로 대화를 할 수 있다. 
+
