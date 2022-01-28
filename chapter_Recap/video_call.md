@@ -319,7 +319,7 @@ wsServer.on("connection", (socket) => {
 
 ## #3.5 Offers
 
-- 두 서버를 연결시키자.
+- 두 서버를 연결시키기 위한 Peer A의 Offers
   1. peerConnection을 두개의 브라우저에 만든다.
   2. addStream을 사용한다. 사용하는 카메라에서 오는 이 stream을 가져다가 이 stream의 데이터를 가져다가 연결을 만들 것이다. 우리는 영상과 오디오를 연결을 통해 전달할 것이다. 그러므로 peer-to-peer 연결 안에 영상과 오디오를 집어넣어야 한다.
   3. peer A는 createOffer를 생성하고 peer B는 createAnswer를 생성한다.
@@ -355,3 +355,69 @@ socket.on("offer", (offer) => {
 
 -> 이것이 바로 Signaling process이다. 즉, offer를 주고 받기 위해서는 서버가 필요하다. offer가 주고 받아진 순간, 우리는 직접적으로 대화를 할 수 있다. 
 
+
+
+## #3.6 Answers
+
+- Peer A에서 offer를 만들었고, 그 다음 setLocalDescription을 해줬다. 이는 Peer A한테 이 description을 알려줬다는 것을 의미한다. Peer A를 위한 localDescription(**offer**)을 보내고 Peer B부분의 RemoteDescription에서 그 offer를 받는다. 즉, 멀리 떨어진 peer의 description을 셋팅을 한다. 
+
+- peer A 브라우저에서 offer를 만들었을 때, LocalDescription을 set한다. peer B 브라우저에서 offer를 받으면, setRemoteDescription을 하고 그리고 같은 함수에서 answer를 만들고 LocalDescription을 set한다. 그러곤 answer를 다시 peer A 브라우저로 돌려보낸다. 이후 peer A 브라우저가 setRemoteDescription을 할 수 있다. 
+
+- Peer B의 Answers ('#3.5'에 이어서) 
+  1. setRemoteDescription을 만든다. 
+  2. offer의 전송이 socketIO로 빠르기 때문에 myPeerConnection이 안받아질 수 있다. handleWelcomeSubmit에서 미리 getMedia()를 불러오자.
+  3. answer를 받는다.
+  4. peer A로 answer를 보낸다.
+  5. 여기까지 실행이 됐다면 두 브라우저는 모두 LocalDescription과 RemoteDescription을 가지게 된다.
+
+- 1/2/3번 실행 결과 화면
+
+![image](https://i.imgur.com/4soHsxg.png)
+
+### 정리
+1. peer A 브라우저에서 offer를 만든다.
+
+2. peer B 가 방에 참가했을 때 offer를 만든다. 이 offer로 setLocalDescription을 한다.
+
+3. peer B 가 들어오면 peer A가 이 코드를 실행한다.
+
+```app.js```
+
+```js
+socket.on("welcome", async () => {
+    const offer = await myPeerConnection.createOffer();
+    myPeerConnection.setLocalDescription(offer);
+    console.log("sent the offer");
+    socket.emit("offer", offer, roomName);
+})
+```
+
+4. 서버에 보내면 peer B 브라우저가 그 offer를 받고 setRemoteDescription을 한다.
+
+```app.js```
+
+```js
+socket.on("offer", async(offer) => {
+    myPeerConnection.setRemoteDescription(offer);
+    const answer = await myPeerConnection.createAnswer();
+    myPeerConnection.setLocalDescription(answer);
+    socket.emit("answer", answer, roomName);
+})
+```
+
+5. 이후 peer B 브라우저는 answer를 생성한다.
+```js
+const answer = await myPeerConnection.createAnswer();
+```
+
+6. peer B는 그 answer로 setLocalDescription을 한다. ( getUserMedia랑 addStream은 우리가 이미 peer B가 방에 들어왔을 때 그것들을 실행했기 때문에 생략한다. )
+
+7. answer을 보낸 후 그 asnwer은 다시 slignaling server 즉, Socket.IO로 돌아간다. 
+
+8. peer A 브라우저에서 그 함수를 받았을 때, 이 코드를 실행해준다.
+
+```js
+socket.on("answer", (answer) => {
+    myPeerConnection.setRemoteDescription(answer);
+})
+```
