@@ -2,6 +2,7 @@ import http from "http";
 import {Server} from "socket.io";
 import {instrument} from "@socket.io/admin-ui";
 import express from "express";
+import { SocketAddress } from "net";
 
 const app = express();
 
@@ -25,6 +26,9 @@ wsServer.on("connection", (socket) => {
     socket.on("answer", (answer, roomName) => {
         socket.to(roomName).emit("answer", answer);
     });
+    socket.on("ice", (ice, roomName) => {
+        socket.to(roomName).emit("ice", ice);
+    })
 })
 
 const handleListen = () => console.log(`Listening on http://localhost:3000`);

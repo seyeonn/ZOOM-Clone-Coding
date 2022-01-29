@@ -421,3 +421,84 @@ socket.on("answer", (answer) => {
     myPeerConnection.setRemoteDescription(answer);
 })
 ```
+
+
+## #3.7 IceCendidate
+
+### IceCandidate
+> Internet Connectivity Establishment(인터넷 연결 생성)
+
+: webRTC에 필요한 프로토콜들을 의미한다. 멀리 떨어진 장치와 소통할 수 있게 하기 위함. **즉, 브라우저가 서로 소통할 수 있게 해주는 방법이다.** 어떤 소통 방법이 가장 좋을 것인지를 제안할 때 쓰인다. 다수의 candidate(후보)들이 각각의 연결에서 제안되고 그리고 그들은 서로의 동의 하에 하나를 선택한다. 그리고 그것을 소통 방식에 사용한다. (answer와 다른 모든 것들을 얻고 난 뒤에 일어남.)
+
+- offer와 answer의 핑퐁을 모두 끝냈을 때, peer-to-peer 연결의 양쪽에서 icecandidate라는 이벤트를 실행하기 시작한다.
+
+- 실행 결과 화면
+
+![image](https://i.imgur.com/MQtgX9P.png)
+
+- 각 브라우저에 candidate를 보낸다.
+
+```app.js```
+
+```js
+socket.on("ice", (ice) => {
+    console.log("received candidate");
+    myPeerConnection.addIceCandidate(ice);
+});
+
+function handleIce(data) {
+    console.log("sent candidate");
+    socket.emit("ice", data.candidate, roomName);
+}
+```
+
+```server.js```
+
+```js
+socket.on("ice", (ice, roomName) => {
+        socket.to(roomName).emit("ice", ice);
+    })
+```
+
+- 실행 결과 화면
+
+![image](https://i.imgur.com/ozSQ1NV.png)
+
+- add Stream event 등록 (각 브라우저에 상대 stream 출력)
+
+```app.js```
+
+```js
+function handleAddStream(data) {
+    console.log("got an stream from my peer");
+    console.log("Peer's Stream: ", data.stream);
+    console.log("My Stream: ", myStream);
+}
+```
+
+- 실행 결과 화면
+
+![image](https://i.imgur.com/1Zhz85d.png)
+
+- 서로의 stream을 받고 비디오를 하나 더 생성
+
+```home.pug```
+
+```js
+ video#peerFace(autoplay, playsinline, width="400", height="400")
+```
+
+```app.js```
+
+```js
+function handleAddStream(data) {
+    const peerFace = document.getElementById("peerFace");
+    peerFace.srcObject = data.stream;
+}
+```
+
+- 실행 결과 화면
+
+![image](https://i.imgur.com/z2hiszB.jpg)
+
+-> 문제점 발생 : 카메라를 바꾸게 되면 stream이 끝나버려서 다른 브라우저에서 적용이 되지 않는다. (더이상 answer를 받지 않음.)
