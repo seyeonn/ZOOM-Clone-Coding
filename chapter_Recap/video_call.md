@@ -502,3 +502,86 @@ function handleAddStream(data) {
 ![image](https://i.imgur.com/z2hiszB.jpg)
 
 -> 문제점 발생 : 카메라를 바꾸게 되면 stream이 끝나버려서 다른 브라우저에서 적용이 되지 않는다. (더이상 answer를 받지 않음.)
+
+
+
+## #3.8 Senders
+
+- 카메라 바꾸는 걸 다루는 function을 다뤄보자.
+
+- 카메라를 바꿀 때마다, makeConnection()에서 새로운 stream을 만들기 때문에 다른 브라우저에서 적용이 안된다. 이 문제를 해결해보자.
+
+```js
+async function handleCameraChange() {
+    await getMedia(cameraSelect.value);
+    if(myPeerConnection) {
+        console.log(myPeerConnection.getSenders());
+    }
+}
+```
+
+- 카메라를 바꾼 후 video를 보내는 sender 실행 결과 화면
+
+![image](https://i.imgur.com/WJP7fjd.png)
+
+- 카메라를 바꿀 때 stream을 새로 바꿔버리지만 user한테 보내는 track은 바꾸지 않는다. 이 문제를 해결하기 위해 Real Time Communication 연결의 track을 바꿔보자. (kind:"video"를 가진 sender를 찾아서 getSender해주기)
+
+- **Sender** : Sender는 우리의 peer로 보내진 media stream track을 컨트롤 할 수 있게 해준다. (우리의 stream을 음소거(mute)할 수도 있고, peer-to-peer connection의 track을 변경할 수도 있다.)
+
+- getMedia(deviceId) function에서 다른 deviceId로 새로운 stream을 만들고 handleCameraChange()에서 video device의 새로운 id로 또다른 stream을 생성했다. 이 뜻은 이 부분 이후로 만약 내가 video track을 받으면 새로 선택한 장치로 업데이트 된 video track을 받는 것이다. 그러므로 handleCameraChange()에서 videoTrack을 받을 수 있다. 그리고 sender를 그 video track으로 바꿔준다. 
+
+```app.js```
+
+```js
+async function handleCameraChange() {
+    await getMedia(cameraSelect.value);
+    if(myPeerConnection) {
+        const videoTrack = myStream.getVideoTracks()[0]; 
+        const videoSender = myPeerConnection
+        .getSenders()
+        .find((sender) => sender.track.kind === "video");
+        videoSender.replaceTrack(videoTrack);
+    }
+}
+```
+
+-> 우리는 현재 2개의 track을 가지고 있다. 하나는 나 자신을 위한 myStream이다. 동시에 다른 peer 브라우저로 데이터를 보낼 때가 Sender를 사용하는 때이다. Sender는 다른 브라우저로 보내진 비디오와 오디오 데이터를 컨트롤하는 방법이다. 
+
+- 실행 결과 화면
+
+![image](https://i.imgur.com/2RITbrx.jpg)
+
+-> 문제점 발생 : 이 웹사이트를 폰으로 접속하면 작동하지 않는다. 
+
+- 문제점을 해결하기 위해 local tunnel을 설치하자.
+
+``` npm i localtunnel```
+
+- local tunnel은 서버를 전세계와 공유하게 해준다. (일시적으로만 무료임.) local tunnel을 사용하면 우리 서버의 url을 생성할 수 있다. 즉, 폰으로 그 url에 접속해서 테스트해 볼 수 있다. 
+
+- 글로벌로 설치해보자.
+
+```npm i -g localtunnel```
+
+- localtunnel이 글로벌로 설치되면 lt를 사용해서 licaltunnel을 호출한다. 이제 커맨드 사용이 가능하다. lt는 local tunnel를 뜻한다. 전세계와 특정 포트를 공유할 수 있다. 커맨드를 실행해보자.
+
+```lt --port 3000```
+
+- url 실행 결과 화면
+
+![image](https://i.imgur.com/L5G8W3K.png)
+
+-> 해당 tunnel 웹사이트라고 알려주는 화면. continu 클릭.
+
+-> 문제점 발생 : localtunnel url로 접속하니 504 Gateway Time-Out이 떴다. 
+
+-> 문제점 해결 : lt 프로세스 실행을 위해 node 서버를 실행종료 시켜서 발생한 문제였다. lt 프로세스를 백그라운드에서 실행시키고 node 서버를 재실행 시키니 문제가 해결되었다. 
+
+![image](https://i.imgur.com/KMibsC6.png)
+
+- 핸드폰에서 room 입장 후 화면
+
+![image](https://i.imgur.com/OfdA9hV.png)
+
+
+
