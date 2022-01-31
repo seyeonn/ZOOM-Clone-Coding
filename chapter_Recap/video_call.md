@@ -581,7 +581,9 @@ async function handleCameraChange() {
 
 - 핸드폰에서 room 입장 후 화면
 
-<img src="https://i.imgur.com/OfdA9hV.png" width="610" height="720"/> <img src="https://i.imgur.com/7bz3exj.png" width="300" height="600"/> <img src="https://i.imgur.com/WFqvp5L.jpg" width="300" height="600"/>
+<img src="https://i.imgur.com/OfdA9hV.png" width="610" height="720"/> 
+
+<img src="https://i.imgur.com/7bz3exj.png" width="300" height="600"/> <img src="https://i.imgur.com/WFqvp5L.jpg" width="300" height="600"/>
 
 
 ## #3.9 STUN
