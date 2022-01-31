@@ -569,7 +569,7 @@ async function handleCameraChange() {
 
 - url 실행 결과 화면
 
-![image](https://i.imgur.com/L5G8W3K.png)
+<img src="https://i.imgur.com/L5G8W3K.png" width="400" height="700"/>
 
 -> 해당 tunnel 웹사이트라고 알려주는 화면. continu 클릭.
 
@@ -577,15 +577,13 @@ async function handleCameraChange() {
 
 -> 문제점 해결 : lt 프로세스 실행을 위해 node 서버를 실행종료 시켜서 발생한 문제였다. lt 프로세스를 백그라운드에서 실행시키고 node 서버를 재실행 시키니 문제가 해결되었다. 
 
-![image](https://i.imgur.com/KMibsC6.png)
+<img src="https://i.imgur.com/KMibsC6.png" width="700" height="300"/>
 
 - 핸드폰에서 room 입장 후 화면
 
-![image](https://i.imgur.com/OfdA9hV.png)
+<img src="https://i.imgur.com/OfdA9hV.png" width="450" height="750"/>
 
-![image](https://i.imgur.com/7bz3exj.png)
-![image](https://i.imgur.com/WFqvp5L.jpg)
-
+<img src="https://i.imgur.com/7bz3exj.png" width="300" height="600"/> <img src="https://i.imgur.com/WFqvp5L.jpg" width="300" height="600"/>
 
 
 ## #3.9 STUN
@@ -618,5 +616,4 @@ myPeerConnection = new RTCPeerConnection({
 
 - 다른 IP(네트워크)에서도 접속이 잘 되는 것을 확인할 수 있다.
 
-![image](https://i.imgur.com/2ICggM5.png)
-
+<img src="https://i.imgur.com/2ICggM5.png" width="450" height="750"/>
