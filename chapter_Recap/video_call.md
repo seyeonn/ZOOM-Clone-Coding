@@ -583,5 +583,40 @@ async function handleCameraChange() {
 
 ![image](https://i.imgur.com/OfdA9hV.png)
 
+![image](https://i.imgur.com/7bz3exj.png)
+![image](https://i.imgur.com/WFqvp5L.jpg)
 
+
+
+## #3.9 STUN
+
+- 이전 #3.8 실행 결과 화면에서 문제점을 발견했다.
+
+- 문제점 발생 : 컴퓨터랑 폰이 같은 wifi에 있지 않으면 에러가 발생. STUN 서버가 없기 때문이다.
+
+- **STUN 서버** : STUN 서버는 컴퓨터가 공용 IP주소를 찾게 해준다. 어떤 것을 request 하면 인터넷에서 사용자가 누군지를 알려주는 서버이다.
+
+- 장치는 공용주소를 알아야 다른 네트워크에 있는 장치들이 서로를 찾을 수 있게 된다. 
+
+- 문제점 해결 : 사용하고자 하는 STUN 서버의 리스트를 추가해주자. 전문적으로 하려면 STUN 서버를 직접 만들어야 하지만 우리는 구글이 무료로 제공해주는 서버를 사용하도록 하자. 
+
+```js
+myPeerConnection = new RTCPeerConnection({
+        iceServers: [
+            {
+                urls: [
+                    "stun:stun.l.google.com:19302",
+                    "stun:stun1.l.google.com:19302",
+                    "stun:stun2.l.google.com:19302",
+                    "stun:stun3.l.google.com:19302",
+                    "stun:stun4.l.google.com:19302",
+                ]
+            }
+        ]
+    });
+```
+
+- 다른 IP(네트워크)에서도 접속이 잘 되는 것을 확인할 수 있다.
+
+![image](https://i.imgur.com/2ICggM5.png)
 
