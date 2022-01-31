@@ -616,4 +616,4 @@ myPeerConnection = new RTCPeerConnection({
 
 - 다른 IP(네트워크)에서도 접속이 잘 되는 것을 확인할 수 있다.
 
-<img src="https://i.imgur.com/2ICggM5.png" width="450" height="750"/>
+<img src="https://i.imgur.com/2ICggM5.png" width="610" height="720"/>
