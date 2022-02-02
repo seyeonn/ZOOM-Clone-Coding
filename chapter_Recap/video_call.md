@@ -664,3 +664,67 @@ myPeerConnection = new RTCPeerConnection({
 
 - 그렇기 때문에 사람들이 업로드하는 그 똑같은 스트림을 다운로드하진 않을 것이다.
 
+
+
+## #3.11 Data Channels
+
+Data Channel을 만드는 방법
+
+1. 무언가를 offer하는 socket이 Data Channel을 생성하는 주체가 되어야 한다. 그리고 offer를 만들기 전에 Data Channel을 만들어야 한다.
+
+```app.js```
+```js
+let myDataChannel;
+```
+
+2. offer를 만들어주고, 받는 코드 작성
+
+```js
+socket.on("welcome", async () => {
+    myDataChannel = myPeerConnection.createDataChannel("chat");
+    myDataChannel.addEventListener("message", console.log);
+    console.log("made data channel");
+    ...
+}
+```
+-> offer를 만드는 peer (offer를 만드는 peer가 Data Channel을 만드는 주체이다.)
+
+-> 다른 peer는 Data Channel을 만들 필요가 없다. 즉, 다른 peer는 Data Channel이 있을 때 Event Listener를 만들면 된다. 
+
+```js
+socket.on("offer", async(offer) => {
+    myPeerConnection.addEventListener("datachannel", console.log);
+    ...
+}
+```
+-> offer를 받는 peer
+
+- 실행 결과 화면
+
+![image](https://i.imgur.com/tFEaisG.png)
+
+3. Data Channel에 대한 eventListener를 추가해준다.
+
+```js
+socket.on("offer", async(offer) => {
+    myPeerConnection.addEventListener("datachannel", (event) => {
+        myDataChannel = event.channel;
+        myDataChannel.addEventListener("message", console.log);
+    });
+    ...
+}
+```
+
+-> offer를 받는 peer는 새로운 Data Channel이 있을 때 그 Data Channel을 저장하고 Data Channel에 eventListener를 추가한다. 
+
+-  실행 결과 화면
+
+![image](https://i.imgur.com/J1PtHFp.png)
+
+![image](https://i.imgur.com/cudFSCw.png)
+
+-> peer-to-peer messaging
+
+-> console.log를 (event) => console.log(event.data)로 변경해주면 필요한 data만 전송이 된다.
+
+
